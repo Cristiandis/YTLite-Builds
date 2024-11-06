@@ -154,13 +154,13 @@ jobs:
           response=$(curl -F "fileToUpload=@YouTubePlus_${{ inputs.tweak_version }}_Tweaks.ipa" https://catbox.moe/user/api.php -F reqtype=fileupload)
           echo "catbox_url=https://catbox.moe/$response" >> $GITHUB_ENV
 
-      - name: Generate or Update repo.json
+      - name: Initialize or Update repo.json
         working-directory: main
         run: |
           repo_file="repo.json"
           app_entry=$(cat <<EOF
           {
-            "name": "Cris' Custom YouTube Plus Repo",
+            "name": "Youtube Plus",
             "bundleIdentifier": "com.google.ios.youtube",
             "developerName": "dayanch96, Cristiandis",
             "version": "${{ inputs.tweak_version }}",
@@ -172,20 +172,14 @@ jobs:
           EOF
           )
 
-          # Check if repo.json exists
-          if [ -f "$repo_file" ]; then
-            # If repo.json exists and is not empty, append to the existing apps array
-            if [ -s "$repo_file" ]; then
-              # Insert new app entry before the closing bracket of the "apps" array
-              sed -i '' 's/]}$/,'"$app_entry"']}/' "$repo_file"
-            else
-              # If repo.json exists but is empty, create a new JSON structure
-              echo '{ "apps": ['"$app_entry"'] }' > "$repo_file"
-            fi
-          else
-            # If repo.json doesn't exist, create a new JSON structure
-            echo '{ "apps": ['"$app_entry"'] }' > "$repo_file"
+          # Initialize repo.json if it doesn't exist or is missing the required structure
+          if [ ! -f "$repo_file" ] || ! grep -q '"apps": \[' "$repo_file"; then
+            echo '{ "name": "Cris' Custom YTLite Repo", "identifier": "com.cris.ytliterepo", "apps": [] }' > "$repo_file"
           fi
+
+          # Insert the new app entry before the closing bracket of the "apps" array
+          sed -i '' 's/]}$/,'"$app_entry"']}/' "$repo_file"
+
 
       - name: Commit and Push repo.json
         working-directory: main
