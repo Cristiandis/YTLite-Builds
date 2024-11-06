@@ -158,13 +158,15 @@ jobs:
         working-directory: main
         run: |
           repo_file="repo.json"
+          touch "$repo_file"
           app_entry="{\"name\":\"Youtube Plus\",\"bundleIdentifier\":\"com.google.ios.youtube\",\"developerName\":\"dayanch96, Cristiandis\",\"version\":\"${{ inputs.tweak_version }}\",\"downloadURL\":\"${{ env.catbox_url }}\",\"iconURL\":\"https://files.catbox.moe/40239g.png\",\"tintColor\":\"#ff0000\",\"localizedDescription\":\"Updated YouTube Plus tweak\"}"
-          if [ ! -f "$repo_file" ]; then
+          if [ ! -s "$repo_file" ]; then
             echo "{\"name\":\"Cris' Custom YTLite Repo\",\"identifier\":\"com.cris.ytliterepo\",\"apps\":[]}" > "$repo_file"
           fi
           temp_file=$(mktemp)
           jq --argjson new_entry "$app_entry" '.apps += [$new_entry]' "$repo_file" > "$temp_file"
-          mv "$temp_file" "$repo_file"
+          cat "$temp_file" > "$repo_file"
+          rm "$temp_file"
 
       - name: Commit and Push repo.json
         working-directory: main
