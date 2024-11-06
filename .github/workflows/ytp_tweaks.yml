@@ -158,7 +158,7 @@ jobs:
         working-directory: main
         run: |
           repo_file="repo.json"
-          app_entry=$(cat <<'EOF'
+          app_entry=$(cat <<EOF
           {
             "name": "Youtube Plus",
             "bundleIdentifier": "com.google.ios.youtube",
@@ -174,7 +174,7 @@ jobs:
 
           # Initialize repo.json if it doesn't exist or is missing the required structure
           if [ ! -f "$repo_file" ] || ! grep -q '"apps": \[' "$repo_file"; then
-            echo '{ "name": "Cris' Custom YTLite Repo", "identifier": "com.cris.ytliterepo", "apps": [] }' > "$repo_file"
+            echo '{ "name": "Cris\' Custom YTLite Repo", "identifier": "com.cris.ytliterepo", "apps": [] }' > "$repo_file"
           fi
 
           # Insert the new app entry before the closing bracket of the "apps" array
