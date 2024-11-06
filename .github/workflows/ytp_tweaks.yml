@@ -181,6 +181,7 @@ jobs:
           fi
 
       - name: Commit and Push repo.json
+        working-directory: main
         run: |
           git config --local user.name "GitHub Actions"
           git config --local user.email "actions@github.com"
