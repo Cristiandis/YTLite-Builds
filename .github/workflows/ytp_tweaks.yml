@@ -174,10 +174,16 @@ jobs:
 
           # Check if repo.json exists
           if [ -f "$repo_file" ]; then
-            # Append the new app entry to the existing JSON array
-            jq '.apps += ['"$app_entry"']' "$repo_file" > tmp.$$.json && mv tmp.$$.json "$repo_file"
+            # If repo.json exists and is not empty, append to the existing apps array
+            if [ -s "$repo_file" ]; then
+              # Insert new app entry before the closing bracket of the "apps" array
+              sed -i '' 's/]}$/,'"$app_entry"']}/' "$repo_file"
+            else
+              # If repo.json exists but is empty, create a new JSON structure
+              echo '{ "apps": ['"$app_entry"'] }' > "$repo_file"
+            fi
           else
-            # Create a new repo.json file
+            # If repo.json doesn't exist, create a new JSON structure
             echo '{ "apps": ['"$app_entry"'] }' > "$repo_file"
           fi
 
@@ -191,6 +197,7 @@ jobs:
           git push
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
 
 
       - name: Upload to GitHub Releases
