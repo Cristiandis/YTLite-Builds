@@ -155,8 +155,9 @@ jobs:
           echo "catbox_url=https://catbox.moe/$response" >> $GITHUB_ENV
 
       - name: Generate or Update repo.json
+        working-directory: main
         run: |
-          repo_file="${{ github.workspace }}/repo.json"
+          repo_file="repo.json"
           app_entry=$(cat <<EOF
           {
             "name": "Cris' Custom YouTube Plus Repo",
@@ -183,13 +184,14 @@ jobs:
       - name: Commit and Push repo.json
         working-directory: main
         run: |
-          git config --local user.name "GitHub Actions"
-          git config --local user.email "actions@github.com"
+          git config --local user.name "github-actions[bot]"
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git add repo.json
-          git commit -m "Update repo.json with YouTubePlus v${{ inputs.tweak_version }}"
+          git commit -m "Update repo.json with YouTubePlus v${{ inputs.tweak_version }}" || echo "No changes to commit"
           git push
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
 
       - name: Upload to GitHub Releases
         uses: softprops/action-gh-release@v2.0.1
