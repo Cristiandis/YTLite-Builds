@@ -158,29 +158,19 @@ jobs:
         working-directory: main
         run: |
           repo_file="repo.json"
-          
-          # Prepare the app entry JSON string with variable expansion
-          app_entry=$(cat <<EOF
-          {
+          app_entry='{
             "name": "Youtube Plus",
-            "bundleIdentifier": "com.google.ios.youtube",
+            "bundleIdentifier": "com.google.ios.youtube", 
             "developerName": "dayanch96, Cristiandis",
             "version": "${{ inputs.tweak_version }}",
             "downloadURL": "${{ env.catbox_url }}",
             "iconURL": "https://files.catbox.moe/40239g.png",
             "tintColor": "#ff0000",
             "localizedDescription": "Updated YouTube Plus tweak"
-          }
-          EOF
-          )
-
-          # Initialize repo.json if it doesn't exist or is missing the required structure
+          }'
           if [ ! -f "$repo_file" ]; then
-            # Initialize the repo.json file with an empty 'apps' array if it does not exist
-            echo '{ "name": "Cris\' Custom YTLite Repo", "identifier": "com.cris.ytliterepo", "apps": [] }' > "$repo_file"
+            echo '{ "name": "Cris\u0027 Custom YTLite Repo", "identifier": "com.cris.ytliterepo", "apps": [] }' > "$repo_file"
           fi
-
-          # Insert the new app entry before the closing bracket of the "apps" array
           sed -i '' 's/]}$/,'"$app_entry"']}/' "$repo_file"
 
       - name: Commit and Push repo.json
