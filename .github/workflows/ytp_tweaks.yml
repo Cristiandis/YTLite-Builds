@@ -21,7 +21,7 @@ concurrency:
 
 jobs:
   build:
-    name: 
+    name: YouTube Plus Build
     runs-on: macos-12
     permissions:
       contents: write
@@ -75,6 +75,14 @@ jobs:
       - name: Download YouTube
         id: download_youtube
         run: wget "${{ inputs.ipa_url }}" --no-verbose -O ${{ github.workspace }}/youtube.ipa
+
+      - name: Extract YouTube Version
+        id: get_youtube_version
+        run: |
+          unzip -p youtube.ipa 'Payload/*.app/Info.plist' > info.plist
+          version=$(defaults read $(pwd)/info.plist CFBundleShortVersionString)
+          echo "youtube_version=$version" >> $GITHUB_ENV
+          rm info.plist
 
       - name: Download YouTube Plus
         id: download_ytp
@@ -159,7 +167,7 @@ jobs:
         run: |
           repo_file="repo.json"
           touch "$repo_file"
-          app_entry="{\"name\":\"Youtube Plus\",\"bundleIdentifier\":\"com.google.ios.youtube\",\"developerName\":\"dayanch96, Cristiandis\",\"version\":\"${{ inputs.tweak_version }}\",\"downloadURL\":\"${{ env.catbox_url }}\",\"iconURL\":\"https://files.catbox.moe/40239g.png\",\"tintColor\":\"#ff0000\",\"localizedDescription\":\"Updated YouTube Plus tweak\"}"
+          app_entry="{\"name\":\"Youtube Plus\",\"bundleIdentifier\":\"com.google.ios.youtube\",\"developerName\":\"dayanch96, Cristiandis\",\"version\":\"${{ env.youtube_version }}\",\"downloadURL\":\"${{ env.catbox_url }}\",\"iconURL\":\"https://files.catbox.moe/40239g.png\",\"tintColor\":\"#ff0000\",\"localizedDescription\":\"Updated YouTube Plus tweak\"}"
           if [ ! -s "$repo_file" ]; then
             echo "{\"name\":\"Cris' Custom YTLite Repo\",\"identifier\":\"com.cris.ytliterepo\",\"apps\":[]}" > "$repo_file"
           fi
@@ -174,7 +182,7 @@ jobs:
           git config --local user.name "github-actions[bot]"
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git add repo.json
-          git commit -m "Update repo.json with YouTubePlus v${{ inputs.tweak_version }}" || echo "No changes to commit"
+          git commit -m "Update repo.json with YouTubePlus v${{ env.youtube_version }}" || echo "No changes to commit"
           git push
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -183,5 +191,5 @@ jobs:
         uses: softprops/action-gh-release@v2.0.1
         with:
           tag_name: v${{ github.run_number }}
-          name: YouTubePlus v${{ inputs.tweak_version }} + Tweaks (${{ github.run_number }})
+          name: YouTubePlus v${{ env.youtube_version }} + Tweaks (${{ github.run_number }})
           draft: false
