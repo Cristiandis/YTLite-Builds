@@ -152,7 +152,7 @@ jobs:
         id: upload_catbox
         run: |
           response=$(curl -F "fileToUpload=@YouTubePlus_${{ inputs.tweak_version }}_Tweaks.ipa" https://catbox.moe/user/api.php -F reqtype=fileupload)
-          echo "catbox_url=https://catbox.moe/$response" >> $GITHUB_ENV
+          echo "catbox_url=$response" >> $GITHUB_ENV
 
       - name: Initialize or Update repo.json
         working-directory: main
